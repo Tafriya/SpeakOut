@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-2">
+<h1 class="text-success">Admin Dashboard</h1>
+  <div class="row text-center mt-4 mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm text-white p-3" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);">
+        <h5>Total Users</h5>
+        <h3>{{ total_users }}</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm text-white p-3" style="background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);">
+        <h5>Total Departments</h5>
+        <h3>{{ total_departments }}</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm text-white p-3" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+        <h5>Total Grievances</h5>
+        <h3>{{ total_grievances }}</h3>
+      </div>
+    </div>
+  </div>
+
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow-lg p-4">
+            <h4 class="mb-3 text-danger">🚨 Priority Grievances</h4>
+            {% if priority_grievance %}
+                <div class="row">
+                    {% for grievance, likes_count in priority_grievance %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 shadow-sm border-left border-success rounded">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ grievance.title }}</h5>
+                                    <p class="card-text text-muted">
+                                        {{ grievance.description[:120] }}{% if grievance.description|length > 120 %}...{% endif %}
+                                    </p>
+                                    <p>
+                                        <strong>Dept:</strong> {{ grievance.department.name }}<br>
+                                        <strong>Status:</strong> {{ grievance.status }}<br>
+                                        <strong>Likes 👍:</strong> {{ likes_count }}
+                                    </p>
+                                    <!-- <a href="{{ url_for('a_view_grievances') }}" class="btn btn-sm btn-outline-primary">
+                                        View All
+                                    </a> -->
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No unresolved grievances at the moment 🎉</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+  <div class="row mt-4 mb-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm p-3">
+        <h4 class="text-success">Recent Grievances</h4>
+        <ul class="list-group">
+          {% for g in recent_grievances %}
+          <li class="list-group-item">
+            <strong>{{ g.title }}</strong> — {{ g.status }}
+            <br><small>{{ g.created_at.strftime("%Y-%m-%d") }}</small>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mt-4">
+  <div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow rounded-3">
+            <div class="card-body">
+                <h5 class="card-title text-center text-success">Grievance Status Distribution</h5>
+                <canvas id="statusChart" style="width:100%; height:300px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card shadow rounded-3">
+            <div class="card-body">
+                <h5 class="card-title text-center text-success">Grievances by Location</h5>
+                <canvas id="locationHeatmap" style="width:100%; height:490px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <div class="row mt-4">
+  <div class="col-md-12">
+    <div class="card shadow-sm">
+      <div class="card-body text-center">
+        <h5 class="card-title text-success mb-3">Grievances per Department</h5>
+        <div style="height: 400px;">
+          <canvas id="departmentChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  async function loadStatusChart() {
+    const response = await fetch("{{ url_for('admin_grievance_stats') }}");
+    const data = await response.json();
+
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: data.labels,
+        datasets: [{
+          data: data.counts,
+          backgroundColor: ['#f39c12', '#3498db', '#2ecc71', '#7f8c8d']
+        }]
+      },
+      options: {
+        plugins: { legend: { position: 'top' } }
+      }
+    });
+  }
+
+  loadStatusChart();
+</script>
+
+<script>
+fetch('/a_location_data')
+  .then(res => res.json())
+  .then(data => {
+    const ctx = document.getElementById('locationHeatmap').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.labels,
+        datasets: [{
+          label: 'Number of Grievances',
+          data: data.values,
+          backgroundColor: data.values.map(v =>
+            v > 20 ? 'red' : v > 10 ? 'orange' : 'green'
+          )
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'Location' } },
+          y: { title: { display: true, text: 'Grievances Count' } }
+        }
+      }
+    });
+  });
+</script>
+
+<canvas id="departmentBarChart"></canvas>
+
+<script>
+fetch("/dashboard/department-data")
+  .then(response => response.json())
+  .then(data => {
+    new Chart(document.getElementById("departmentChart"), {
+      type: "bar",
+      data: {
+        labels: data.labels,
+        datasets: [{
+          label: "Grievances",
+          data: data.values,
+          backgroundColor: "rgba(54, 162, 235, 0.7)",
+          borderColor: "rgba(54, 162, 235, 1)",
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  });
+</script>
+
+{% endblock %}

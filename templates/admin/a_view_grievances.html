@@ -1,0 +1,156 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4 text-success">All Grievances</h2>
+
+  <!-- Search + Nested Dropdown (single form, JS applies filters & submits) -->
+  <form id="filterForm" method="GET" action="{{ url_for('a_view_grievances') }}" class="row g-3 mb-4">
+    <div class="col-md-10">
+      <input type="text" name="search" value="{{ request.args.get('search','') }}" class="form-control"
+             placeholder="Search by title or description">
+    </div>
+
+    <!-- hidden fields hold current filters; JS updates them -->
+    <input type="hidden" name="status"     value="{{ request.args.get('status','') }}">
+    <input type="hidden" name="department" value="{{ request.args.get('department','') }}">
+    <input type="hidden" name="location"   value="{{ request.args.get('location','') }}">
+
+    <div class="col-md-2 text-end">
+      <div class="btn-group">
+        <button type="button" class="btn btn-secondary dropdown-toggle btn-success" data-bs-toggle="dropdown" aria-expanded="false">
+          Filter
+        </button>
+        <ul class="dropdown-menu">
+
+          <!-- Status submenu -->
+          <li class="dropdown-submenu">
+            <a class="dropdown-item dropdown-toggle" href="#">Status</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" onclick="applyFilter('status','Pending')">Pending</a></li>
+              <li><a class="dropdown-item" href="#" onclick="applyFilter('status','In Progress')">In Progress</a></li>
+              <li><a class="dropdown-item" href="#" onclick="applyFilter('status','Resolved')">Resolved</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" onclick="applyFilter('status','')">All Status</a></li>
+            </ul>
+          </li>
+
+
+          <!-- Department submenu -->
+          <li class="dropdown-submenu">
+            <a class="dropdown-item dropdown-toggle" href="#">Department</a>
+            <ul class="dropdown-menu">
+              {% for dept in departments %}
+                <li><a class="dropdown-item" href="#" onclick="applyFilter('department','{{ dept.id }}')">{{ dept.name }}</a></li>
+              {% endfor %}
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" onclick="applyFilter('department','')">All Departments</a></li>
+            </ul>
+          </li>
+
+
+          <!-- Location submenu (fixed list) -->
+          <li class="dropdown-submenu">
+            <a class="dropdown-item dropdown-toggle" href="#">Location</a>
+            <ul class="dropdown-menu">
+              {% for loc in locations %}
+                <li><a class="dropdown-item" href="#" onclick="applyFilter('location','{{ loc }}')">{{ loc }}</a></li>
+              {% endfor %}
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" onclick="applyFilter('location','')">All Locations</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <button type="button" class="btn btn-outline-secondary ms-2" onclick="clearFilters()">Clear</button>
+    </div>
+  </form>
+
+  <div class="mb-3">
+    {% if request.args.get('status') %}
+      <span class="badge bg-light text-dark border me-2">Status: {{ request.args.get('status') }}
+        <a href="#" class="ms-1 text-decoration-none" onclick="applyFilter('status','')">&times;</a>
+      </span>
+    {% endif %}
+    {% if request.args.get('department') %}
+      <span class="badge bg-light text-dark border me-2">
+        Dept: {{
+          (departments|selectattr('id','equalto', request.args.get('department')|int)|list)[0].name
+          if request.args.get('department') and departments else request.args.get('department')
+        }}
+        <a href="#" class="ms-1 text-decoration-none" onclick="applyFilter('department','')">&times;</a>
+      </span>
+    {% endif %}
+    {% if request.args.get('location') %}
+      <span class="badge bg-light text-dark border me-2">Location: {{ request.args.get('location') }}
+        <a href="#" class="ms-1 text-decoration-none" onclick="applyFilter('location','')">&times;</a>
+      </span>
+    {% endif %}
+  </div>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>S.No</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Reported By</th>
+        <th>Department</th>
+        <th>Location</th>
+        <th>Created On</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if grievances %}
+        {% for grievance in grievances %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ grievance.title }}</td>
+          <td>{{ grievance.description }}</td>
+          <td>{{ grievance.status }}</td>
+          <td>{{ grievance.user.username if grievance.user else '—' }}</td>
+          <td>{{ grievance.department.name if grievance.department else '—' }}</td>
+          <td>{{ grievance.location.title() or '—' }}</td>
+          <td>{{ grievance.created_at.strftime('%Y-%m-%d') if grievance.created_at else '—' }}</td>
+          <td>
+            <a href="{{ url_for('a_open_grievance', id=grievance.id) }}"
+               class="btn btn-sm btn-primary">View</a>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="9" class="text-center text-muted">No grievances found.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<style>
+.dropdown-submenu { position: relative; }
+.dropdown-submenu > .dropdown-menu {
+  top: 0; left: 100%;
+  margin-left: .1rem; margin-right: .1rem;
+}
+</style>
+
+<script>
+function applyFilter(field, value) {
+  const f = document.getElementById('filterForm');
+  if (field === 'status')     f.elements['status'].value = value;
+  if (field === 'department') f.elements['department'].value = value;
+  if (field === 'location')   f.elements['location'].value = value;
+  f.submit();
+}
+function clearFilters() {
+  const f = document.getElementById('filterForm');
+  f.elements['status'].value = '';
+  f.elements['department'].value = '';
+  f.elements['location'].value = '';
+  f.elements['search'].value = '';
+  f.submit();
+}
+</script>
+{% endblock %}

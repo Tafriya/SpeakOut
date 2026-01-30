@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}SpeakOut - Public Grievance Portal{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <style>
+        .hero-slide {
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+
+.hero-slide .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.hero-slide .container {
+  position: relative;
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+  top: 0 !important;
+  right: 100% !important;   
+  left: auto !important;    
+  margin-top: -1px !important;
+}
+
+</style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+   
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold text-success" href="{{ url_for('index') }}">SpeakOut</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav ms-auto">
+         
+        {% if session.get('role') == 'admin' %}
+          <ul class="navbar-nav ms-auto">
+  <li class="nav-item">
+    <a class="nav-link text-success" href="{{ url_for('a_dashboard') }}">Dashboard</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-success" href="{{ url_for('a_view_grievances') }}">Grievances</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-success" href="{{ url_for('a_view_notices') }}">Notices</a>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle text-success" id="navbarDropdownAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      {{ session.get('username') }} (Admin)
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownAdmin">
+      <li><a class="dropdown-item text-success" href="{{ url_for('a_manage_users') }}">Manage Users</a></li>
+      <li><a class="dropdown-item text-success" href="{{ url_for('a_manage_departments') }}">Manage Departments</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Logout</a></li>
+    </ul>
+  </li>
+</ul>
+
+ {% elif session.get('role') == 'user' %}
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('about') }}">About</a></li>
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('all_grievances') }}">Browse</a></li>
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('submit_grievance') }}">Report</a></li>
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('u_notices') }}">Notices</a></li>
+
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="{{ url_for('static', filename='uploads/' + (session.get('profile_pic') or 'default_profile.png')) }}"
+                   alt="Profile" class="rounded-circle" style="width: 25px; height: 25px; object-fit: cover;">
+              {{ session.get('username') }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
+              <li><a class="dropdown-item" href="{{ url_for('u_dashboard') }}">Dashboard</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('profile') }}">View Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+          </li>
+        
+
+        {% elif session.get('role') == 'department' %}
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('d_dashboard') }}">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('d_all_grievances') }}">Grievances</a></li>
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('d_notices') }}">Notice</a></li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownDept" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="{{ url_for('static', filename='uploads/departments/' + (session.get('profile_pic') or 'default_department.png')) }}"
+                   alt="" class="rounded-circle" style="width: 25px; height: 25px; object-fit: cover;">
+              {{ session.get('username') }} (Dept)
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownDept">
+              <li><a class="dropdown-item" href="{{ url_for('update_profile') }}">Update Profile</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('d_view_notices') }}">View Notices</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+          </li>
+
+        {% else %}
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('about') }}">About</a></li>
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('all_grievances') }}">Browse</a></li>
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('submit_grievance') }}">Report</a></li>
+          <li class="nav-item"><a class="nav-link text-success" href="{{ url_for('login') }}">Login</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+
+<main class="flex-grow-1">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+    <div class="container py-4">
+      {% block content %}
+      
+      {% endblock %}
+    </div>
+  </main>
+<footer class="mt-auto bg-success text-white text-center py-3">
+  <div class="container">
+    <p class="mb-1">&copy; 2025 SpeakOut. All rights reserved.</p>
+    <p class="mb-0">Contact us at <a href="mailto:support@speakout.com" class="text-white text-decoration-underline">support@speakout.com</a></p>
+  </div>
+</footer>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  document.querySelectorAll('.dropdown-submenu > a').forEach(function(element){
+    element.addEventListener('click', function (e) {
+      e.preventDefault(); 
+      e.stopPropagation(); 
+
+      let submenu = this.nextElementSibling;
+      if(submenu){
+        submenu.classList.toggle('show');
+      }
+
+      this.closest('.dropdown-menu').querySelectorAll('.dropdown-menu.show').forEach(function(openMenu){
+        if(openMenu !== submenu){
+          openMenu.classList.remove('show');
+        }
+      });
+    });
+  });
+
+  document.querySelectorAll('.dropdown').forEach(function(dropdown){
+    dropdown.addEventListener('hide.bs.dropdown', function () {
+      this.querySelectorAll('.dropdown-menu.show').forEach(function(submenu){
+        submenu.classList.remove('show');
+      });
+    })
+  });
+});
+</script>
+</body>
+
+</html>

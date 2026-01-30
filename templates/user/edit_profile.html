@@ -1,0 +1,77 @@
+
+{% extends "base.html" %}
+{% block title %}Edit Profile - SpeakOut{% endblock %}
+
+{% block content %}
+<div class="container mt-3 d-flex justify-content-center">
+  <div class="card shadow-lg p-4 rounded-4" style="max-width: 600px; width: 100%;">
+    <h3 class="text-center text-success mb-4">Edit Profile</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+      <!-- Profile Picture Section -->
+      <div class="text-center mb-4">
+        <label class="form-label fw-bold d-block">Current Profile Picture</label>
+        <img src="{{ url_for('static', filename='uploads/' + (user.profile_pic or 'default_profile.png')) }}"
+             id="current-pic"
+             alt="Profile"
+             class="rounded-circle border border-3 border-success"
+             style="width: 120px; height: 120px; object-fit: cover;">
+      </div>
+
+      <div class="mb-4">
+        <label for="profile_pic" class="form-label fw-bold d-block">Change Profile Picture</label>
+        <input type="file" name="profile_pic" id="profile_pic" class="form-control">
+        <div class="mt-3 text-center">
+          <img id="preview" class="rounded-circle d-none"
+               style="width: 120px; height: 120px; object-fit: cover; border: 2px dashed #198754;">
+        </div>
+      </div>
+
+      <!-- Username -->
+      <div class="mb-3">
+        <label class="form-label fw-bold d-block">Change Username</label>
+        <input type="text" name="username" class="form-control" value="{{ user.username }}" required>
+      </div>
+
+      <!-- Email -->
+<div class="mb-3">
+  <label class="form-label fw-bold d-block">Change Email</label>
+  <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+</div>
+
+
+      <!-- Location -->
+      <div class="mb-4">
+        <label class="form-label fw-bold d-block">Change Location</label>
+        <select class="form-select" name="location" required>
+          <option value="kasaragod" {% if user.location == "kasaragod" %}selected{% endif %}>Kasaragod</option>
+          <option value="mangalore" {% if user.location == "mangalore" %}selected{% endif %}>Mangalore</option>
+          <option value="bangalore" {% if user.location == "bangalore" %}selected{% endif %}>Bangalore</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-success w-100 py-2 rounded-3">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- Live Preview for New Profile Picture -->
+<script>
+  document.getElementById("profile_pic").addEventListener("change", function(event) {
+    let preview = document.getElementById("preview");
+    let file = event.target.files[0];
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.classList.remove("d-none");
+    }
+  });
+
+  // Auto-hide flash messages after 3 seconds
+  setTimeout(function(){
+    document.querySelectorAll('.alert').forEach(function(alert){
+      alert.classList.remove('show');
+      alert.classList.add('fade');
+    });
+  }, 3000);
+</script>
+{% endblock %}

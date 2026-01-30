@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Grievance Details - SpeakOut{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+  
+
+  <!-- Main Grievance Card -->
+  <div class="card shadow-lg border-0 rounded-3 p-3">
+    <div class="row g-0">
+    <div class="text-center mb-2 mt-5">
+    <h2 class="fw-bold text-success">📌 Grievance Details</h2>
+    <p class="text-muted">Track the status, share feedback, and engage with this grievance.</p>
+  </div>
+      <!-- Grievance Info -->
+      <div class="col-md-7">
+        <div class="card-body">
+          <h4 class="card-title text-success mb-3">{{ grievance.title }}</h4>
+
+          <p><strong>Reported by:</strong> {{ grievance.user.username }}</p>
+          <p><strong>Department:</strong> {{ grievance.department.name if grievance.department else 'N/A' }}</p>
+          <p>
+            <strong>Status:</strong>
+            <span class="badge bg-{{ 'success' if grievance.status == 'Resolved' else 'warning' }} px-3 py-2">
+              {{ grievance.status }}
+            </span>
+          </p>
+
+          <p><strong>Description:</strong></p>
+          <p class="text-muted">{{ grievance.description }}</p>
+          <hr>
+          <p><strong>📅 Submitted on:</strong> {{ grievance.created_at.strftime('%Y-%m-%d') }}</p>
+          <p><strong>📍 Location:</strong> {{ grievance.location or 'Not specified' }}</p>
+
+          {% if grievance.user_id == session.user_id %}
+            <div class="d-flex gap-2 mt-3">
+              <a href="{{ url_for('edit_grievance', grievance_id=grievance.id) }}" 
+                 class="btn btn-outline-primary btn-sm">
+                 ✏️ Edit
+              </a>
+              <form method="POST" action="{{ url_for('delete_grievance', grievance_id=grievance.id) }}" class="d-inline">
+                <button type="submit" class="btn btn-outline-danger btn-sm"
+                        onclick="return confirm('Are you sure you want to delete this grievance?')">
+                        🗑️ Delete
+                </button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Grievance Image -->
+      <div class="col-md-5 d-flex align-items-center justify-content-center p-3">
+        {% if grievance.image %}
+          <img src="{{ url_for('static', filename='uploads/' + grievance.image) }}"
+               alt="Grievance Image"
+               class="img-fluid rounded shadow"
+               style="max-height: 350px; object-fit: cover;">
+        {% else %}
+          <div class="alert alert-light border shadow-sm w-100 text-center" role="alert">
+            <span class="text-muted">📷 No image attached.</span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Card Footer with Like Button -->
+    <div class="card-footer bg-white border-0 text-center">
+  <form method="POST" class="d-inline">
+    {% if has_liked %}
+      <button type="submit" name="like" class="btn btn-danger">💔 Unlike</button>
+    {% else %}
+      <button type="submit" name="like" class="btn btn-outline-secondary">🤍 Like</button>
+    {% endif %}
+  </form>
+  <span class="ms-2 text-muted">{{ like_count }} like{{ 's' if like_count != 1 else '' }}</span>
+</div>
+
+
+  <!-- Comments Section -->
+  <div class="mt-5">
+    <h4 class="fw-bold mb-3">💬 Comments</h4>
+
+    {% if comments %}
+      <ul class="list-group mb-4 shadow-sm rounded">
+        {% for comment in comments %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+              <strong class="text-primary">{{ comment.user.username }}</strong>
+              <small class="text-muted">{{ comment.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+            </div>
+            <p class="mb-0 mt-2">{{ comment.message }}</p>
+
+            {% if comment.user_id == session.user_id %}
+              <div class="mt-2 d-flex gap-2">
+                <a href="{{ url_for('edit_comment', comment_id=comment.id) }}" class="btn btn-sm btn-outline-primary">✏️ Edit</a>
+                <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}" class="d-inline">
+                  <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this comment?')">🗑️ Delete</button>
+                </form>
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No comments yet. Be the first to share your thoughts! 🎉</p>
+    {% endif %}
+
+    <!-- Add Comment Form -->
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <form method="POST">
+          <div class="mb-3">
+            <label for="message" class="form-label fw-semibold">Add a Comment:</label>
+            <textarea class="form-control" name="message" id="message" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-success">Post Comment</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+

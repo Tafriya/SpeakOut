@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h2 class="text-success">{{ department.name }} Dashboard</h2>
+
+
+  <div class="row mb-4 mt-4">
+    
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+            <div class="card-body text-center">
+                <h6 class="card-title">Total Grievances</h6>
+                <h3>{{ total_grievances }}</h3>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #f7971e, #ffd200); color: white;">
+            <div class="card-body text-center">
+                <h6 class="card-title">Pending</h6>
+                <h3>{{ pending_count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #36d1dc, #5b86e5); color: white;">
+            <div class="card-body text-center">
+                <h6 class="card-title">In Progress</h6>
+                <h3>{{ inprogress_count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #11998e, #38ef7d); color: white;">
+            <div class="card-body text-center">
+                <h6 class="card-title">Resolved</h6>
+                <h3>{{ resolved_count }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="text-success mt-6"> Priority Grievances (Most Liked, Unresolved) </h3>
+<table class="table table-bordered mt-6">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Likes</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if priority_grievances %}
+            {% for grievance, like_count in priority_grievances %}
+            <tr>
+                <td>{{ grievance.id }}</td>
+                <td>{{ grievance.title }}</td>
+                <td>{{ grievance.description }}</td>
+                <td>{{ like_count }}</td>
+                <td>
+                    <form action="{{ url_for('update_grievance_status', grievance_id=grievance.id) }}" method="POST" class="d-flex">
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="Pending" {% if grievance.status == 'Pending' %}selected{% endif %}>Pending</option>
+                            <option value="In Progress" {% if grievance.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                            <option value="Resolved" {% if grievance.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                        </select>
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-sm btn-success">Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">
+                    No priority grievances at the moment.
+                </td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+<div class="charts-row">
+  <div class="chart-card mt-4">
+    <h3 class="text-success text-center">Grievance Status Distribution</h3>
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <div class="chart-card mt-4">
+    <h3 class="text-success text-center">Grievances by Location</h3>
+    <canvas id="heatmapChart"></canvas>
+  </div>
+</div>
+
+<style>
+.charts-row {
+  display: flex;
+  justify-content: center;  
+  gap: 50px;                
+  flex-wrap: wrap;         
+}
+
+.chart-card {
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 15px;
+  padding: 20px;
+  width: 500px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#myChart, #heatmapChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('myChart');
+  const myChart = new Chart(ctx, {
+    type: 'pie',
+    data: { labels: [], datasets: [{ data: [], backgroundColor: ['#ff6384','#36a2eb','#4caf50'] }] },
+    options: { responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: { enabled: true },
+            legend: {
+                position: 'right',  
+                align: 'center'
+            }
+        },
+  animation: { animateRotate: true, animateScale: true }}
+  });
+
+  function updateChart() {
+    fetch("/dashboard/status-data")
+      .then(res => res.json())
+      .then(data => {
+        myChart.data.labels = data.labels;
+        myChart.data.datasets[0].data = data.values;
+        myChart.update();
+      });
+  }
+
+  updateChart();                  
+  setInterval(updateChart, 5000); 
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctxHeat = document.getElementById('heatmapChart').getContext('2d');
+const heatmapChart = new Chart(ctxHeat, {
+    type: 'bar',
+    data: {
+        labels: [],   
+        datasets: [{
+            label: 'No. of Grievances',
+            data: [],
+            backgroundColor: function(context) {
+                const value = context.dataset.data[context.dataIndex];
+                if (value > 20) return '#ff0000';   
+                if (value > 10) return '#ffa500';   
+                return '#4caf50';                  
+            }
+        }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: { display: false },
+        title: { display: true, text: 'Heatmap by Location', font: { size: 16 } }
+    },
+    scales: { y: { beginAtZero: true } },
+    animation: {
+        duration: 1000,           
+        easing: 'easeOutQuart',   
+        animateScale: true,       
+        animateRotate: false      
+    },
+    transitions: {
+        show: { duration: 500 },
+        hide: { duration: 500 },
+        active: { duration: 300 }
+    }
+}
+
+});
+
+function updateHeatmap() {
+  fetch("/dashboard/location-data")
+    .then(res => res.json())
+    .then(data => {
+        heatmapChart.data.labels = data.labels;
+        heatmapChart.data.datasets[0].data = data.values;
+        heatmapChart.update();
+    });
+}
+
+updateHeatmap();
+setInterval(updateHeatmap, 5000); 
+</script>
+
+</div>
+{% endblock %}

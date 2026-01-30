@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - SpeakOut</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+  
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand text-success fw-bold" href="/">SpeakOut</a>
+    </div>
+  </nav>
+    <div class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+  </div>
+  
+  <main class="flex-grow-1 d-flex align-items-center justify-content-center">
+    <div class="card shadow-sm p-4 mt-3 mb-3" style="max-width: 400px; width: 100%;">
+      <h3 class="text-center text-success mb-4">Login to SpeakOut</h3>
+      <form action="/login" method="POST">
+         <div class="mb-3">
+      <label for="role" class="form-label">Login as a:</label>
+      <select name="role" class="form-select" required>
+        <option value="user">User</option>
+        <option value="department">Department</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+
+        <div class="d-grid mb-3">
+          <button type="submit" class="btn btn-success">Login</button>
+        </div>
+
+        <p class="text-center text-muted">
+          Don't have an account?
+          <a href="{{ url_for('register') }}" class="text-success text-decoration-none">Register here</a>
+        </p>
+      </form>
+    </div>
+  </main>
+
+  
+  <footer class="mt-auto bg-success text-white text-center py-3">
+    <div class="container">
+      <p class="mb-1">&copy; 2025 SpeakOut. All rights reserved.</p>
+      <p class="mb-0">Need help? <a href="mailto:support@speakout.com" class="text-white text-decoration-underline">Contact Support</a></p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

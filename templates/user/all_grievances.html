@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}All Grievances - SpeakOut{% endblock %}
+
+{% block content %}
+
+<form method="GET" action="{{ url_for('all_grievances') }}" class="d-flex mb-4">
+  <input type="text" name="search" class="form-control me-2"
+         placeholder="Search grievances..."
+         value="{{ request.args.get('search', '') }}">
+  
+  <div class="dropdown">
+    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      Filters
+    </button>
+    <ul class="dropdown-menu">
+
+      <!-- Department submenu -->
+      <li class="dropdown-submenu">
+        <a class="dropdown-item dropdown-toggle" href="#">Department</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search','')) }}">All</a></li>
+          {% for dept in departments %}
+            <li>
+              <a class="dropdown-item"
+                 href="{{ url_for('all_grievances', search=request.args.get('search',''), department_id=dept.id) }}">
+                {{ dept.name }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+
+      <!-- Status submenu -->
+      <li class="dropdown-submenu">
+        <a class="dropdown-item dropdown-toggle" href="#">Status</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search','')) }}">All</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search',''), status='Pending') }}">Pending</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search',''), status='In Progress') }}">In Progress</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search',''), status='Resolved') }}">Resolved</a></li>
+        </ul>
+      </li>
+
+      <!-- Location submenu -->
+      <li class="dropdown-submenu">
+        <a class="dropdown-item dropdown-toggle" href="#">Location</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search','')) }}">All</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search',''), location='kasaragod') }}">Kasaragod</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search',''), location='mangalore') }}">Mangalore</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search',''), location='bangalore') }}">Bangalore</a></li>
+        </ul>
+      </li>
+
+      <!-- Sort submenu -->
+      <li class="dropdown-submenu">
+        <a class="dropdown-item dropdown-toggle" href="#">Sort</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search',''), sort='latest') }}">Latest</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('all_grievances', search=request.args.get('search',''), sort='likes') }}">Most Liked</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <a href="{{ url_for('all_grievances') }}" class="btn btn-outline-secondary ms-2">Clear</a>
+</form>
+
+<div class="container mt-5">
+  <h2 class="text-success mb-4">All Grievances</h2>
+  {% if grievances %}
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for g in grievances %}
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            {% if g.image %}
+              <img src="{{ url_for('static', filename='uploads/' + g.image) }}"
+                   class="card-img-top" alt="Grievance Image"
+                   style="max-height: 200px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ g.title }}</h5>
+              <p class="card-text">{{ g.description[:100] }}...</p>
+              <span class="badge bg-{{ 'success' if g.status == 'Resolved' else 'warning' }}">{{ g.status }}</span>
+            </div>
+            <div class="card-footer">
+              <form action="{{ url_for('toggle_like', grievance_id=g.id) }}" method="post" style="display: inline;">
+  <button type="submit" class="btn btn-sm {{ 'btn-danger' if g.id in liked_ids else 'btn-outline-danger' }}">
+    ♥ Like
+  </button>
+</form>
+<small class="text-muted ms-2">{{ like_counts.get(g.id, 0) }} likes</small><br>
+              <!-- <small class="text-muted">Category: {{ g.category or 'N/A' }}</small><br>
+              <small class="text-muted">Submitted on {{ g.created_at.strftime('%Y-%m-%d') }}</small><br> -->
+              <a href="{{ url_for('view_grievance', id=g.id) }}" class="btn btn-outline-success btn-sm mt-2">View Details</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No grievances available.</p>
+  {% endif %}
+</div>
+{% endblock %}

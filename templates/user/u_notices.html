@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-success">Notices for {{ session['username'] }}</h2>
+    {% for notice in notices %}
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">{{ notice.title }}</h5>
+            <p class="card-text">{{ notice.message }}</p>
+            <small class="text-muted">
+                Department: 
+                {% if notice.department %}
+                    {{ notice.department.name if notice.department.name else notice.department }}
+                {% else %}
+                    General
+                {% endif %}
+                | Location: {{ notice.location }}
+                | {{ notice.timestamp.strftime("%d-%m-%Y %H:%M") }}
+            </small>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-muted">No notices available for your location.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

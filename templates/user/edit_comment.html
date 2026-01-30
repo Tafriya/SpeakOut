@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit Comment - SpeakOut{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h3 class="mb-4">Edit Your Comment</h3>
+  <form method="POST">
+    <div class="mb-3">
+      <textarea name="message" class="form-control" rows="4" required>{{ comment.message }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Update Comment</button>
+    <a href="{{ url_for('view_grievance', id=comment.grievance_id) }}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

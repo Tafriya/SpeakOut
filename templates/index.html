@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Home - SpeakOut{% endblock %}
+
+{% block content %}
+<section>
+  <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <div class="hero-slide" style="background-image: url('/static/img/potholes.jpg');">
+        <div class="overlay"></div>
+        <div class="container text-center text-white position-relative">
+          <h1 class="display-4 fw-bold">Welcome to SpeakOut</h1>
+          <p class="lead">Raise your voice. Report grievances. Make a difference.</p>
+          <a href="submit_grievance" class="btn btn-success btn-lg mt-3">Get Started</a>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <div class="hero-slide" style="background-image: url('/static/img/ambulance.jpg');">
+        <div class="overlay"></div>
+        <div class="container text-center text-white position-relative">
+          <h1 class="display-4 fw-bold">Welcome to SpeakOut</h1>
+          <p class="lead">Your complaint can bring change.</p>
+          <a href="submit_grievance" class="btn btn-success btn-lg mt-3">Get Started</a>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <div class="hero-slide" style="background-image: url('/static/img/garbage.jpg');">
+        <div class="overlay"></div>
+        <div class="container text-center text-white position-relative">
+          <h1 class="display-4 fw-bold">Welcome to SpeakOut</h1>
+          <p class="lead">Together, let’s build a better society.</p>
+          <a href="submit_grievance" class="btn btn-success btn-lg mt-3">Get Started</a>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <div class="hero-slide" style="background-image: url('/static/img/water.jpg');">
+        <div class="overlay"></div>
+        <div class="container text-center text-white position-relative">
+          <h1 class="display-4 fw-bold">Welcome to SpeakOut</h1>
+          <p class="lead">A better tomorrow starts with your voice today.</p>
+          <a href="submit_grievance" class="btn btn-success btn-lg mt-3">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</section>
+<section class="py-5 bg-white text-center">
+  <div class="container">
+    <h2 class="text-success fw-bold mb-4">What is SpeakOut?</h2>
+    <p class="lead text-muted mb-4">
+      SpeakOut is a public grievance reporting platform designed to bridge the gap between citizens and the authorities meant to serve them. Whether you're facing issues like poor sanitation, broken streetlights, illegal constructions, or public safety concerns — SpeakOut offers a centralized portal where you can raise your voice and ensure your complaint is documented. Every grievance submitted goes into a structured system, making it easier for officials to track, prioritize, and respond effectively.
+    </p>
+
+    <p class="lead text-muted">
+      We believe that transparency and accessibility are key to a more accountable society. That’s why SpeakOut not only empowers users to report issues, but also allows tracking of grievance status, adding comments, and receiving updates. With separate dashboards for users and administrators, the platform ensures smooth communication and better resolution management. SpeakOut isn't just a website — it's a step toward civic engagement, digital empowerment, and social responsibility.
+    </p>
+  </div>
+</section>
+
+<section class="py-5 bg-light text-center">
+  <div class="container">
+    <h2 class="text-success fw-bold mb-5">What SpeakOut Helps You Do</h2>
+    <div class="row justify-content-center text-center">
+      <div class="col-md-5 mb-4">
+        <div class="card border-success h-100">
+          <div class="card-body">
+            <h5 class="card-title text-success">Submit Grievances</h5>
+            <p class="card-text"> Report issues like public safety hazards, infrastructure problems, or civic neglect directly to the responsible authorities.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5 mb-4">
+        <div class="card border-success h-100">
+          <div class="card-body">
+            <h5 class="card-title text-success">Track Progress</h5>
+            <p class="card-text">Keep an eye on the status of your grievance anytime, from anywhere.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5 mb-4">
+        <div class="card border-success h-100">
+          <div class="card-body">
+            <h5 class="card-title text-success">Get Notices</h5>
+            <p class="card-text">Get notices by the department about the potential Problems/Threats.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5 mb-4">
+        <div class="card border-success h-100">
+          <div class="card-body">
+            <h5 class="card-title text-success">Priority Grievances</h5>
+            <p class="card-text">Most liked grievance will be the Priority Grievance.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5 mb-4">
+        <div class="card border-success h-100">
+          <div class="card-body">
+            <h5 class="card-title text-success">Admin Support</h5>
+            <p class="card-text">Grievances are reviewed by authorized officials for fast resolution.</p>
+          </div>
+        </div>
+      </div>
+     </div>
+  </div>
+</section>
+{% endblock %}

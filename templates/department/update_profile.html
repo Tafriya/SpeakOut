@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-3 d-flex justify-content-center">
+  <div class="card shadow-lg p-4" style="max-width: 600px; width: 100%; border-radius: 15px;">
+    <h3 class="text-center text-success mb-4">Update Department Profile</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="name" class="form-label fw-semibold">Department Name</label>
+        <input type="text" class="form-control" id="name" name="name" 
+               value="{{ department.name }}" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="username" class="form-label fw-semibold">Username</label>
+        <input type="text" class="form-control" id="username" name="username" 
+               value="{{ department.username }}" required>
+      </div>
+
+      <div class="mb-3 text-center">
+        <label class="form-label fw-semibold d-block">Current Profile Picture</label>
+        <img src="{{ url_for('static', filename='uploads/departments/' + department.profile_pic) }}" 
+             alt="Profile Picture" class="img-thumbnail shadow-sm mb-2" width="150" style="border-radius: 50%;">
+      </div>
+
+      <div class="mb-3">
+        <label for="profile_pic" class="form-label fw-semibold">Upload New Profile Picture</label>
+        <input type="file" class="form-control" id="profile_pic" name="profile_pic">
+      </div>
+
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{{ url_for('d_dashboard') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+        <button type="submit" class="btn btn-success px-4">Update Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

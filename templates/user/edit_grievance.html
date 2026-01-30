@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Edit Grievance - SpeakOut{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h3>Edit Grievance</h3>
+  <form method="POST">
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      <input type="text" name="title" class="form-control" value="{{ grievance.title }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea name="description" class="form-control" rows="4" required>{{ grievance.description }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label for="category" class="form-label">Category</label>
+      <select name="category" class="form-select" required>
+        <option value="Infrastructure" {% if grievance.category == 'Infrastructure' %}selected{% endif %}>Infrastructure</option>
+        <option value="Safety" {% if grievance.category == 'Safety' %}selected{% endif %}>Safety</option>
+        <option value="Sanitation" {% if grievance.category == 'Sanitation' %}selected{% endif %}>Sanitation</option>
+        <option value="Other" {% if grievance.category == 'Other' %}selected{% endif %}>Other</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="location" class="form-label">Location</label>
+      <input type="text" name="location" class="form-control" value="{{ grievance.location }}" required>
+    </div>
+    <button type="submit" class="btn btn-success">Update</button>
+    <a href="{{ url_for('view_grievance', id=grievance.id) }}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

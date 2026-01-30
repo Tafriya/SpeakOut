@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">All Notices</h2>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>S.No</th>
+        <th>Title</th>
+        <th>Content</th>
+        <th>Department</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if notices %}
+        {% for notice in notices %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ notice.title }}</td>
+          <td>{{ notice.message }}</td>
+          <td>{{ notice.department.name if notice.department else '—' }}</td>
+          <td>{{ notice.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+          <td>
+            <a href="{{ url_for('a_delete_notice', id=notice.id) }}" 
+               class="btn btn-sm btn-danger"
+               onclick="return confirm('Are you sure you want to delete this notice?');">
+              Delete
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6" class="text-center text-muted">No notices available.</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

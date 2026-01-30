@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="text-success m-0">Grievance Details</h3>
+
+  <form method="POST" action="{{ url_for('update_grievance_status', grievance_id=grievance.id) }}" class="d-flex align-items-center">
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <select class="form-select form-select-sm me-2" name="status" required>
+      <option value="Pending" {% if grievance.status == "Pending" %}selected{% endif %}>Pending</option>
+      <option value="In Progress" {% if grievance.status == "In Progress" %}selected{% endif %}>In Progress</option>
+      <option value="Resolved" {% if grievance.status == "Resolved" %}selected{% endif %}>Resolved</option>
+    </select>
+    <button type="submit" class="btn btn-sm btn-success">Update</button>
+  </form>
+</div>
+
+
+  <table class="table table-bordered">
+    <tr><th>ID</th><td>{{ grievance.id }}</td></tr>
+    <tr><th>Title</th><td>{{ grievance.title }}</td></tr>
+    <tr><th>Description</th><td>{{ grievance.description }}</td></tr>
+    <tr><th>Status</th><td>{{ grievance.status }}</td></tr>
+    <tr><th>User</th><td>{{ grievance.user.username }}</td></tr>
+    <tr><th>Department</th><td>{{ grievance.department.name }}</td></tr>
+    <tr><th>Location</th><td>{{ grievance.location }}</td></tr>
+    <tr><th>Likes</th><td>{{ like_count }}</td></tr>
+    <tr><th>Submitted On</th><td>{{ grievance.created_at.strftime('%Y-%m-%d') }}</td></tr>
+    <tr>
+      <th>Image</th>
+      <td>
+        {% if grievance.image %}
+          <img src="{{ url_for('static', filename='uploads/' ~ grievance.image) }}"
+               alt="Grievance Image"
+               style="max-width:300px; height:auto;">
+        {% else %}
+          No image provided.
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+  <h5 class="mt-4">Comments ({{ comments|length }})</h5>
+  {% if comments %}
+    <ul class="list-group">
+      {% for c in comments %}
+        <li class="list-group-item">
+          <strong>{{ c.user.username }}:</strong> {{ c.message }}
+          <small class="text-muted float-end">{{ c.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No comments yet.</p>
+  {% endif %}
+
+  <a href="{{ url_for('d_all_grievances') }}" class="btn btn-secondary mt-3">Back to All Grievances</a>
+</div>
+{% endblock %}
